@@ -1,9 +1,12 @@
 # 🚆 Mumbai Suburban Railway — Ticket Booking & FIFO Queue Simulator
 
+[![Live Demo](https://img.shields.io/badge/Live%20Demo-GitHub%20Pages-brightgreen?logo=github)](https://patwaaditi.github.io/dsa-ticket-booking-simulator/)
 [![C++](https://img.shields.io/badge/C%2B%2B-11%20%2F%2014%20%2F%2017-00599C?logo=c%2B%2B&logoColor=white)](https://isocpp.org/)
 [![HTML5](https://img.shields.io/badge/HTML5-E34F26?logo=html5&logoColor=white)](https://developer.mozilla.org/en-US/docs/Web/HTML)
 [![CSS3](https://img.shields.io/badge/CSS3-1572B6?logo=css3&logoColor=white)](https://developer.mozilla.org/en-US/docs/Web/CSS)
 [![JavaScript](https://img.shields.io/badge/JavaScript-ES6+-F7DF1E?logo=javascript&logoColor=black)](https://developer.mozilla.org/en-US/docs/Web/JavaScript)
+
+> 🌐 **Live Web Application:** [https://patwaaditi.github.io/dsa-ticket-booking-simulator/](https://patwaaditi.github.io/dsa-ticket-booking-simulator/)
 
 An end-to-end Data Structures and Algorithms (DSA) mini-project simulating the high-volume ticket booking, queue management, and cancellation workflows of the **Mumbai Suburban Railway** (Western, Central, and Harbour lines).
 
