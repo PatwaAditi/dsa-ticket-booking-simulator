@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description"
+        content="Mumbai Suburban Railway Ticket Booking Simulator — Western, Central &amp; Harbour Lines">
+    <title>Mumbai Local — Ticket Counter Simulator</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=DM+Sans:wght@400;500;600;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <!-- ═══ TOP BAR ═══ -->
+    <header id="top-bar">
+        <div class="bar-left">
+            <div class="ir-logo">
+                <span class="ir-diamond"></span>
+                <span class="ir-text">IR</span>
+            </div>
+            <span class="bar-label">WESTERN RAILWAY — SUBURBAN</span>
+        </div>
+        <h1 id="app-title">मुंबई लोकल</h1>
+        <div class="bar-right">
+            <span class="dot live"></span>
+            <span class="bar-label" id="clock"></span>
+        </div>
+    </header>
+
+    <!-- ═══ PRESENTATION CONTROL BAR (MANUAL SIMULATOR CONTROLS) ═══ -->
+    <div id="presentation-bar">
+        <div class="pres-badge">
+            <span class="pres-dot"></span>
+            <span class="pres-badge-title">MANUAL PRESENTATION MODE</span>
+            <span class="pres-badge-sub">FIFO Queue &amp; Fare Engine</span>
+        </div>
+
+        <div class="pres-actions">
+            <!-- Enqueue input & button -->
+            <div class="pres-input-wrap">
+                <input type="text" id="pres-passenger-name" placeholder="Passenger name (optional)..." maxlength="22"
+                    autocomplete="off" />
+                <button id="pres-btn-enqueue" class="pres-btn pres-btn-primary"
+                    title="Enqueue a passenger into FIFO Queue">+ Enqueue (FIFO)</button>
+            </div>
+
+            <!-- Dequeue / Serve button -->
+            <button id="pres-btn-dequeue" class="pres-btn pres-btn-accent"
+                title="Serve the front passenger at Counter 2">▶ Serve Next (Dequeue)</button>
+
+            <!-- Clear Queue button -->
+            <button id="pres-btn-clear" class="pres-btn pres-btn-subtle" title="Clear all waiting passengers">✕
+                Clear</button>
+
+            <div class="pres-separator"></div>
+
+            <!-- Toggles for optional auto features -->
+            <label class="pres-toggle-label" title="Automate choices for background demo only if needed">
+                <input type="checkbox" id="pres-toggle-autodemo">
+                <span class="pres-toggle-track"><span class="pres-toggle-thumb"></span></span>
+                <span class="pres-toggle-text">Auto Demo</span>
+            </label>
+
+            <label class="pres-toggle-label" title="Periodically add passengers to queue">
+                <input type="checkbox" id="pres-toggle-autoarrival">
+                <span class="pres-toggle-track"><span class="pres-toggle-thumb"></span></span>
+                <span class="pres-toggle-text">Auto Arrive</span>
+            </label>
+        </div>
+    </div>
+
+    <!-- ═══ UPPER HALF: STATION CONCOURSE ═══ -->
+    <section id="concourse">
+        <!-- 3 COUNTER WINDOWS -->
+        <div id="counters-row">
+            <div class="counter closed" id="counter-1">
+                <div class="counter-shutter"></div>
+                <div class="counter-label">COUNTER 1</div>
+                <div class="counter-status">CLOSED</div>
+            </div>
+            <div class="counter active" id="counter-2">
+                <div class="counter-window">
+                    <div class="counter-header-row">
+                        <div class="counter-label">COUNTER 2</div>
+                        <!-- Step Tracker Breadcrumbs -->
+                        <div class="counter-stepper" id="counter-stepper">
+                            <span class="step-pill" data-step="type">1. Type</span>
+                            <span class="step-arrow">›</span>
+                            <span class="step-pill" data-step="line">2. Line</span>
+                            <span class="step-arrow">›</span>
+                            <span class="step-pill" data-step="stations">3. Route</span>
+                            <span class="step-arrow">›</span>
+                            <span class="step-pill" data-step="class_">4. Class</span>
+                            <span class="step-arrow">›</span>
+                            <span class="step-pill" data-step="qty">5. Qty</span>
+                            <span class="step-arrow">›</span>
+                            <span class="step-pill" data-step="pay">6. Pay</span>
+                        </div>
+                        <div class="counter-header-right">
+                            <span class="counter-status open-status">● OPEN</span>
+                            <button id="btn-cancel-booking" class="btn-cancel-tx"
+                                title="Cancel booking for current customer" style="display:none;">✕ Cancel</button>
+                        </div>
+                    </div>
+
+                    <!-- Ticket form appears here -->
+                    <div id="ticket-form-area">
+                        <!-- STEP 0: waiting for customer -->
+                        <div class="form-step visible" id="step-waiting">
+                            <div class="waiting-card">
+                                <div class="waiting-header">
+                                    <span class="waiting-status-dot"></span>
+                                    <span class="waiting-title">COUNTER 2 CLERK READY</span>
+                                </div>
+                                <div class="waiting-info-box">
+                                    <div class="waiting-msg" id="waiting-status-msg">Loading queue...</div>
+                                    <div class="waiting-passenger-highlight" id="waiting-passenger-highlight">
+                                        <span class="wph-label">HEAD OF QUEUE (FIFO FRONT):</span>
+                                        <span class="wph-name" id="waiting-passenger-name">—</span>
+                                    </div>
+                                </div>
+                                <div class="waiting-action-row">
+                                    <button class="opt-btn next-btn" id="btn-waiting-serve">▶ Call &amp; Serve Passenger
+                                        (Dequeue)</button>
+                                    <button class="opt-btn" id="btn-waiting-add">+ Add Passenger</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- STEP 1: ticket type -->
+                        <div class="form-step" id="step-type">
+                            <div class="step-label">PASSENGER: <span id="lbl-customer-name"></span></div>
+                            <div class="step-question">Step 1 — Select Ticket Type</div>
+                            <div class="btn-row">
+                                <button class="opt-btn" data-type="single">Single Journey</button>
+                                <button class="opt-btn" data-type="return">Return Journey</button>
+                                <button class="opt-btn" data-type="pass">Monthly Pass</button>
+                            </div>
+                            <div class="step-hint">Choose journey type to determine fare multiplier (Single 1x · Return
+                                2x · Pass 15x)</div>
+                        </div>
+
+                        <!-- STEP 2: line -->
+                        <div class="form-step" id="step-line">
+                            <div class="step-question">Step 2 — Select Railway Line</div>
+                            <div class="btn-row">
+                                <button class="opt-btn" data-line="western">Western Line</button>
+                                <button class="opt-btn" data-line="central">Central Line</button>
+                                <button class="opt-btn" data-line="harbour">Harbour Line</button>
+                            </div>
+                            <div class="step-nav-row">
+                                <button class="step-back-btn" data-back="type">← Back to Type</button>
+                            </div>
+                        </div>
+
+                        <!-- STEP 3: stations (from / to) -->
+                        <div class="form-step" id="step-stations">
+                            <div class="step-question">Step 3 — Select Route Stations</div>
+                            <div class="station-selects">
+                                <div class="sel-group">
+                                    <label for="sel-from">Origin (From)</label>
+                                    <select id="sel-from"></select>
+                                </div>
+                                <span class="arrow-icon">➔</span>
+                                <div class="sel-group">
+                                    <label for="sel-to">Destination (To)</label>
+                                    <select id="sel-to"></select>
+                                </div>
+                            </div>
+                            <div class="step-nav-row">
+                                <button class="step-back-btn" data-back="line">← Back to Line</button>
+                                <button class="opt-btn next-btn" id="btn-confirm-route">Confirm Route →</button>
+                            </div>
+                        </div>
+
+                        <!-- STEP 4: class -->
+                        <div class="form-step" id="step-class">
+                            <div class="step-question">Step 4 — Select Travel Class</div>
+                            <div class="btn-row">
+                                <button class="opt-btn" data-class="second">II Class (General)</button>
+                                <button class="opt-btn" data-class="first">I Class</button>
+                                <button class="opt-btn" data-class="ac">AC EMU</button>
+                            </div>
+                            <div class="step-nav-row">
+                                <button class="step-back-btn" data-back="stations">← Back to Route</button>
+                            </div>
+                        </div>
+
+                        <!-- STEP 5: quantity -->
+                        <div class="form-step" id="step-qty">
+                            <div class="step-question">Step 5 — Number of Passengers</div>
+                            <div class="qty-row">
+                                <button class="qty-btn" id="qty-minus" type="button">−</button>
+                                <span class="qty-display" id="qty-val">1</span>
+                                <button class="qty-btn" id="qty-plus" type="button">+</button>
+                            </div>
+                            <div class="step-nav-row">
+                                <button class="step-back-btn" data-back="class_">← Back to Class</button>
+                                <button class="opt-btn next-btn" id="btn-confirm-qty">Confirm Quantity →</button>
+                            </div>
+                        </div>
+
+                        <!-- STEP 6: date (for pass) -->
+                        <div class="form-step" id="step-date">
+                            <div class="step-question">Step 6 — Season Pass Start Date</div>
+                            <div class="btn-row">
+                                <button class="opt-btn" data-date="today">Starting Today</button>
+                                <button class="opt-btn" data-date="tomorrow">Starting Tomorrow</button>
+                            </div>
+                            <div class="step-nav-row">
+                                <button class="step-back-btn" data-back="qty">← Back to Quantity</button>
+                            </div>
+                        </div>
+
+                        <!-- STEP 7: summary + pay -->
+                        <div class="form-step" id="step-pay">
+                            <div class="summary-card" id="summary-card"></div>
+                            <div class="step-nav-row">
+                                <button class="step-back-btn" id="btn-pay-back">← Adjust Details</button>
+                                <button class="pay-btn" id="btn-pay">COLLECT CASH &amp; ISSUE ₹<span
+                                        id="pay-amount">0</span></button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="counter closed" id="counter-3">
+                <div class="counter-shutter"></div>
+                <div class="counter-label">COUNTER 3</div>
+                <div class="counter-status">CLOSED</div>
+            </div>
+        </div>
+
+        <!-- QUEUE (bird's eye) -->
+        <div id="queue-area">
+            <div id="queue-track">
+                <div id="queue-rope-left" class="queue-rope"></div>
+                <div id="queue-lane"></div>
+                <div id="queue-rope-right" class="queue-rope"></div>
+            </div>
+            <div id="queue-info">
+                <span class="qi-label">FIFO QUEUE</span>
+                <span class="qi-count" id="queue-count">0</span>
+                <span class="qi-max">/ 12 MAX</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- ═══ LOWER HALF: PLATFORM ═══ -->
+    <section id="platform">
+        <div id="platform-header">
+            <span class="platform-name" id="platform-station-name">MUMBAI CENTRAL</span>
+            <div class="platform-indicators">
+                <div class="track-indicator">
+                    <span class="track-label">PF 1</span>
+                    <span class="track-status" id="pf1-status">—</span>
+                </div>
+                <div class="track-indicator">
+                    <span class="track-label">PF 2</span>
+                    <span class="track-status" id="pf2-status">—</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Train Indicator Board -->
+        <div class="train-indicator-board" id="indicator-board">
+            <div class="indicator-item">
+                <span class="indicator-pf">PF1</span>
+                <span class="indicator-train-name" id="ind-train-1">—</span>
+                <span class="indicator-dest" id="ind-dest-1">—</span>
+                <span class="indicator-eta" id="ind-eta-1">—</span>
+            </div>
+            <div class="indicator-separator"></div>
+            <div class="indicator-item">
+                <span class="indicator-pf">PF2</span>
+                <span class="indicator-train-name" id="ind-train-2">—</span>
+                <span class="indicator-dest" id="ind-dest-2">—</span>
+                <span class="indicator-eta" id="ind-eta-2">—</span>
+            </div>
+        </div>
+
+        <div id="tracks-area">
+            <!-- Foot Overbridge container (rendered by JS) -->
+            <div class="foot-overbridge" id="fob-container"></div>
+
+            <!-- Track 1 -->
+            <div class="track" id="track-1">
+                <div class="rail top-rail"></div>
+                <div class="sleepers"></div>
+                <div class="rail bottom-rail"></div>
+                <div class="train" id="train-1"></div>
+            </div>
+            <!-- Platform strip -->
+            <div id="platform-strip">
+                <div class="platform-edge top-edge"></div>
+                <div class="platform-floor" id="platform-floor">
+                    <div class="platform-marking"></div>
+                    <div class="platform-marking"></div>
+                    <div class="platform-marking"></div>
+                    <div class="platform-marking"></div>
+                    <div class="platform-marking"></div>
+                    <div class="platform-marking"></div>
+                    <div class="platform-marking"></div>
+                    <div class="platform-marking"></div>
+                </div>
+                <div class="platform-edge bottom-edge"></div>
+            </div>
+            <!-- Track 2 -->
+            <div class="track" id="track-2">
+                <div class="rail top-rail"></div>
+                <div class="sleepers"></div>
+                <div class="rail bottom-rail"></div>
+                <div class="train" id="train-2"></div>
+            </div>
+        </div>
+        <!-- Train info display -->
+        <div id="train-info-bar">
+            <div class="train-info-item" id="info-pf1">
+                <span class="info-direction" id="info-dir-1">—</span>
+                <span class="info-dest" id="info-dest-1"></span>
+                <span class="info-time" id="info-time-1"></span>
+            </div>
+            <div class="train-info-item" id="info-pf2">
+                <span class="info-direction" id="info-dir-2">—</span>
+                <span class="info-dest" id="info-dest-2"></span>
+                <span class="info-time" id="info-time-2"></span>
+            </div>
+        </div>
+    </section>
+
+    <!-- ═══ LOG SIDEBAR (collapsible) ═══ -->
+    <aside id="log-sidebar">
+        <button id="log-toggle" aria-label="Toggle log">▸ LOG</button>
+        <div id="log-content">
+            <div id="log-feed"></div>
+        </div>
+    </aside>
+
+    <!-- ═══ STATS OVERLAY ═══ -->
+    <div id="stats-bar">
+        <div class="stat-chip"><span class="sc-label">SERVED</span><span class="sc-val" id="stat-served">0</span></div>
+        <div class="stat-chip"><span class="sc-label">TICKETS</span><span class="sc-val" id="stat-tickets">0</span>
+        </div>
+        <div class="stat-chip"><span class="sc-label">REVENUE</span><span class="sc-val" id="stat-revenue">₹0</span>
+        </div>
+    </div>
+
+    <!-- ═══ TOAST ═══ -->
+    <div id="toast-container"></div>
+
+    <!-- ═══ UTS SUBURBAN TICKET CONFIRMATION MODAL ═══ -->
+    <div id="ticket-modal" class="ticket-modal-overlay" style="display:none;">
+        <div class="ticket-card-popup">
+            <div class="ticket-header-strip">
+                <div class="ticket-ir-emblem">IR</div>
+                <div class="ticket-header-title">
+                    <span class="th-main">INDIAN RAILWAYS · भारतीय रेल</span>
+                    <span class="th-sub">MUMBAI SUBURBAN UTS TICKET · उपनगरीय टिकट</span>
+                </div>
+                <div class="ticket-uts-badge">UTS ONLINE</div>
+            </div>
+
+            <div class="ticket-body">
+                <div class="ticket-meta-row">
+                    <span class="tm-id">BOOKING ID: <strong id="tkt-booking-id">BK-1001</strong></span>
+                    <span class="tm-time" id="tkt-issue-time">24-10-2026 18:45</span>
+                </div>
+
+                <div class="ticket-passenger-row">
+                    <span class="t-label">PASSENGER NAME</span>
+                    <span class="t-value highlight" id="tkt-passenger-name">Rahul Sharma</span>
+                </div>
+
+                <div class="ticket-route-block">
+                    <div class="route-from">
+                        <span class="t-label">ORIGIN</span>
+                        <span class="t-station" id="tkt-from">Churchgate</span>
+                    </div>
+                    <div class="route-arrow-wrap">
+                        <span class="route-line-label" id="tkt-line">WESTERN LINE</span>
+                        <span class="route-arrow-icon">➔ ➔ ➔</span>
+                        <span class="route-dist" id="tkt-dist">~35 km</span>
+                    </div>
+                    <div class="route-to">
+                        <span class="t-label">DESTINATION</span>
+                        <span class="t-station" id="tkt-to">Borivali</span>
+                    </div>
+                </div>
+
+                <div class="ticket-grid">
+                    <div class="tg-item">
+                        <span class="t-label">JOURNEY TYPE</span>
+                        <span class="t-val" id="tkt-type">Single Journey</span>
+                    </div>
+                    <div class="tg-item">
+                        <span class="t-label">TRAVEL CLASS</span>
+                        <span class="t-val" id="tkt-class">I Class</span>
+                    </div>
+                    <div class="tg-item">
+                        <span class="t-label">PASSENGERS</span>
+                        <span class="t-val" id="tkt-qty">1 Adult</span>
+                    </div>
+                    <div class="tg-item">
+                        <span class="t-label">VALIDITY</span>
+                        <span class="t-val" id="tkt-validity">Today (Within 1 hr)</span>
+                    </div>
+                </div>
+
+                <div class="ticket-fare-row">
+                    <div class="t-fare-desc">Total Fare Collected (incl. GST &amp; Surcharge)</div>
+                    <div class="t-fare-amount">₹<span id="tkt-total">85</span></div>
+                </div>
+
+                <div class="ticket-barcode-section">
+                    <div class="ticket-barcode"></div>
+                    <div class="ticket-auth-code" id="tkt-auth-code">AUTH: IR-WR-9824-MUM-OK · HAPPY JOURNEY शुभवसंत
+                    </div>
+                </div>
+            </div>
+
+            <div class="ticket-footer-actions">
+                <button id="btn-ticket-done" class="ticket-btn-done">✓ Issue Ticket &amp; Complete (Return to
+                    Concourse)</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="data.js"></script>
+    <script src="app.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,1419 @@
+/* ═══════════════════════════════════════════════════════
+   MUMBAI LOCAL — Ticket Counter Simulator — Stylesheet
+   Indian Railways Authentic Theme · Realistic People
+   Foot Overbridges · Escalators · Platform Life
+   ═══════════════════════════════════════════════════════ */
+
+/* ═══ RESET ═══ */
+*, *::before, *::after {
+    margin: 0; padding: 0; box-sizing: border-box;
+}
+html, body, section, div, aside, nav, header, main, form, select {
+    overflow: hidden;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+::-webkit-scrollbar { display: none; }
+
+html, body {
+    height: 100vh; width: 100vw; overflow: hidden;
+}
+
+/* ═══ TOKENS — Indian Railways Authentic ═══ */
+:root {
+    /* IR Classic: Cream walls, Maroon/Brown accents, Platform grey */
+    --bg:            #1a1510;
+    --bg-warm:       #221e17;
+    --bg-card:       #2a241c;
+    --bg-input:      #332c22;
+    --border:        #4a3f2e;
+    --border-light:  #3a3225;
+
+    --text:          #c4b896;
+    --text-dim:      #8a7d66;
+    --text-bright:   #f0e8d0;
+    --text-label:    #6a5f4a;
+
+    /* IR Signature Colors */
+    --ir-maroon:     #8B1A1A;
+    --ir-cream:      #F5E6C8;
+    --ir-blue:       #1B4F72;
+    --ir-dark-blue:  #154360;
+    --ir-red:        #C0392B;
+    --ir-yellow:     #F1C40F;
+    --ir-orange:     #E67E22;
+    --ir-green:      #27AE60;
+    --ir-green-dim:  #1E8449;
+
+    --accent:        #D4A017;
+    --accent-dim:    #B8860B;
+    --accent-hover:  #E4B027;
+
+    --green:         #27AE60;
+    --green-bright:  #2ECC71;
+    --red:           #C0392B;
+    --amber:         #F39C12;
+    --blue:          #2980B9;
+
+    --counter-bg:    #251f16;
+    --counter-open:  #2d2518;
+    --counter-closed:#1e1a14;
+
+    --platform-bg:   #1f1b14;
+    --platform-floor-color: #3d3528;
+    --rail:          #6b6355;
+    --sleeper:       #4a4035;
+    --ballast:       #2a2520;
+    --train-body:    #1B4F72;
+    --train-stripe:  #d5c687;
+
+    --fob-color:     #5a5045;
+    --fob-pillar:    #4a4238;
+    --escalator-color: #6a6050;
+
+    --font-mono: 'IBM Plex Mono', 'Courier New', monospace;
+    --font-sans: 'DM Sans', 'Segoe UI', sans-serif;
+
+    --radius: 3px;
+    --radius-m: 5px;
+
+    --ease:     cubic-bezier(0.25, 0.1, 0.25, 1);
+    --dur:      0.6s;
+    --dur-fast: 0.35s;
+}
+
+body {
+    font-family: var(--font-sans);
+    background: var(--bg);
+    color: var(--text);
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    -webkit-font-smoothing: antialiased;
+    position: relative;
+}
+
+
+/* ═══ TOP BAR — IR Maroon Header ═══ */
+#top-bar {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 20px; height: 40px; min-height: 40px;
+    background: linear-gradient(180deg, var(--ir-maroon) 0%, #6B1414 100%);
+    border-bottom: 3px solid var(--ir-yellow);
+    flex-shrink: 0; z-index: 10;
+}
+.bar-left, .bar-right {
+    display: flex; align-items: center; gap: 8px; min-width: 160px;
+}
+.bar-right { justify-content: flex-end; }
+.bar-label {
+    font-family: var(--font-mono); font-size: 9.5px;
+    letter-spacing: 1.2px; color: var(--ir-cream); text-transform: uppercase;
+    opacity: 0.85;
+}
+.dot { width: 6px; height: 6px; border-radius: 50%; background: var(--green-bright); }
+.dot.live { animation: pulse-dot 2s var(--ease) infinite; }
+@keyframes pulse-dot { 0%,100%{opacity:1;} 50%{opacity:0.3;} }
+
+#app-title {
+    font-family: var(--font-sans); font-size: 15px; font-weight: 700;
+    color: var(--ir-yellow); letter-spacing: 3px;
+    text-shadow: 0 1px 3px rgba(0,0,0,0.4);
+}
+#clock {
+    font-family: var(--font-mono); font-variant-numeric: tabular-nums;
+    color: var(--ir-cream);
+}
+
+/* IR logo */
+.ir-logo {
+    display: flex; align-items: center; gap: 5px;
+    background: var(--ir-cream); padding: 2px 6px; border-radius: 2px;
+}
+.ir-diamond {
+    width: 10px; height: 10px; background: var(--ir-maroon);
+    transform: rotate(45deg); display: inline-block;
+}
+.ir-text {
+    font-family: var(--font-mono); font-size: 10px; font-weight: 700;
+    color: var(--ir-maroon); letter-spacing: 1px;
+}
+
+
+/* ═══ PRESENTATION BAR (MANUAL SIMULATOR CONTROLS) ═══ */
+#presentation-bar {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 16px; height: 38px; min-height: 38px;
+    background: #1e1913;
+    border-bottom: 1.5px solid #423625;
+    flex-shrink: 0; z-index: 10;
+    gap: 12px;
+}
+
+.pres-badge {
+    display: flex; align-items: center; gap: 8px;
+    background: rgba(139, 26, 26, 0.25);
+    border: 1px solid rgba(241, 196, 15, 0.4);
+    padding: 3px 9px; border-radius: 4px;
+    flex-shrink: 0;
+}
+.pres-dot {
+    width: 7px; height: 7px; border-radius: 50%;
+    background: #2ECC71;
+    box-shadow: 0 0 6px rgba(46, 204, 113, 0.7);
+    animation: pulse-dot 2s infinite;
+}
+.pres-badge-title {
+    font-family: var(--font-mono); font-size: 10px; font-weight: 700;
+    color: var(--ir-yellow); letter-spacing: 1.2px; text-transform: uppercase;
+}
+.pres-badge-sub {
+    font-family: var(--font-mono); font-size: 8.5px;
+    color: var(--text-dim); letter-spacing: 0.5px;
+}
+
+.pres-actions {
+    display: flex; align-items: center; gap: 8px;
+    flex-wrap: nowrap;
+}
+
+.pres-input-wrap {
+    display: flex; align-items: center; gap: 4px;
+}
+#pres-passenger-name {
+    padding: 4px 8px; height: 26px;
+    background: #2a2218; border: 1px solid #4a3d2c;
+    border-radius: var(--radius); color: #f5eedc;
+    font-family: var(--font-mono); font-size: 9.5px;
+    width: 170px; outline: none;
+    transition: border-color 0.2s;
+}
+#pres-passenger-name:focus {
+    border-color: var(--accent);
+    background: #32291d;
+}
+
+.pres-btn {
+    height: 26px; padding: 0 10px;
+    border-radius: var(--radius);
+    font-family: var(--font-mono); font-size: 9.5px; font-weight: 600;
+    letter-spacing: 0.8px; text-transform: uppercase;
+    cursor: pointer; display: inline-flex; align-items: center; justify-content: center;
+    border: 1px solid transparent;
+    transition: all 0.2s var(--ease);
+    white-space: nowrap;
+}
+.pres-btn-primary {
+    background: #27AE60; color: #fff;
+    border-color: #1E8449;
+}
+.pres-btn-primary:hover {
+    background: #2ECC71; box-shadow: 0 2px 8px rgba(46,204,113,0.3);
+}
+.pres-btn-accent {
+    background: var(--ir-maroon); color: var(--ir-cream);
+    border-color: var(--ir-yellow);
+}
+.pres-btn-accent:hover:not(:disabled) {
+    background: #A52020; box-shadow: 0 2px 8px rgba(139,26,26,0.4);
+}
+.pres-btn-accent:disabled {
+    opacity: 0.45; cursor: not-allowed;
+}
+.pres-btn-subtle {
+    background: #2e261c; color: var(--text-dim);
+    border-color: #423625;
+}
+.pres-btn-subtle:hover {
+    background: #3d3326; color: var(--text-bright);
+}
+
+.pres-separator {
+    width: 1px; height: 18px; background: #423625; margin: 0 4px;
+}
+
+/* Switches */
+.pres-toggle-label {
+    display: inline-flex; align-items: center; gap: 5px;
+    cursor: pointer; user-select: none;
+}
+.pres-toggle-label input { display: none; }
+.pres-toggle-track {
+    width: 28px; height: 14px;
+    background: #383023;
+    border-radius: 8px;
+    position: relative;
+    transition: background 0.2s;
+    border: 1px solid #4e4332;
+    display: inline-block;
+}
+.pres-toggle-thumb {
+    width: 10px; height: 10px;
+    background: #8c7f6b;
+    border-radius: 50%;
+    position: absolute; top: 1px; left: 1px;
+    transition: transform 0.2s, background 0.2s;
+}
+.pres-toggle-label input:checked + .pres-toggle-track {
+    background: #1B4F72; border-color: #2980B9;
+}
+.pres-toggle-label input:checked + .pres-toggle-track .pres-toggle-thumb {
+    transform: translateX(14px);
+    background: #5DADE2;
+}
+.pres-toggle-text {
+    font-family: var(--font-mono); font-size: 8.5px;
+    color: var(--text-dim); letter-spacing: 0.5px;
+    text-transform: uppercase;
+}
+
+
+/* ═══ CONCOURSE (TOP HALF) ═══ */
+#concourse {
+    flex: 1; min-height: 0;
+    display: flex; flex-direction: column;
+    background: linear-gradient(180deg, #2a241c 0%, #221e17 100%);
+    border-bottom: 2px solid var(--ir-maroon);
+    position: relative;
+}
+
+
+/* ── COUNTERS ROW ── */
+#counters-row {
+    display: flex; height: 55%; min-height: 0;
+    border-bottom: 1px solid var(--border);
+}
+
+.counter {
+    flex: 1; display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    position: relative;
+    border-right: 1px solid var(--border);
+}
+.counter:last-child { border-right: none; }
+
+/* closed counter */
+.counter.closed {
+    background: var(--counter-closed);
+}
+.counter-shutter {
+    width: 80%; height: 60%;
+    background: var(--border);
+    border-radius: var(--radius);
+    position: relative;
+    display: flex; align-items: center; justify-content: center;
+}
+.counter-shutter::after {
+    content: '';
+    position: absolute; inset: 0;
+    background: repeating-linear-gradient(
+        0deg,
+        transparent, transparent 5px,
+        var(--bg) 5px, var(--bg) 6px
+    );
+    border-radius: var(--radius);
+    opacity: 0.3;
+}
+.counter-label {
+    font-family: var(--font-mono); font-size: 9px;
+    letter-spacing: 2px; color: var(--text-label);
+    text-transform: uppercase; margin-top: 8px;
+}
+.counter-status {
+    font-family: var(--font-mono); font-size: 8px;
+    letter-spacing: 1.5px; color: var(--red);
+    text-transform: uppercase; margin-top: 3px;
+}
+.counter-status.open-status { color: var(--green-bright); }
+
+/* active counter */
+.counter.active {
+    background: var(--counter-open);
+    flex: 1.4;
+}
+.counter-window {
+    width: 96%; height: 100%;
+    display: flex; flex-direction: column;
+    padding: 6px 12px 4px;
+    position: relative;
+}
+
+.counter-header-row {
+    display: flex; align-items: center; justify-content: space-between;
+    width: 100%; border-bottom: 1px solid var(--border-light);
+    padding-bottom: 4px; margin-bottom: 2px;
+    gap: 8px; flex-shrink: 0;
+}
+.counter-header-row .counter-label {
+    margin-top: 0; font-size: 9px; font-weight: 700; color: var(--ir-yellow);
+}
+.counter-header-right {
+    display: flex; align-items: center; gap: 8px;
+}
+.counter-stepper {
+    display: flex; align-items: center; gap: 3px;
+}
+.step-pill {
+    font-family: var(--font-mono); font-size: 8px;
+    color: var(--text-label); padding: 1px 5px;
+    border-radius: 2px; background: rgba(0,0,0,0.25);
+    border: 1px solid transparent;
+    transition: all 0.2s;
+}
+.step-pill.active {
+    color: var(--ir-yellow); background: var(--bg-card);
+    border-color: var(--accent-dim); font-weight: 600;
+}
+.step-pill.done {
+    color: var(--green-bright);
+}
+.step-arrow {
+    font-family: var(--font-mono); font-size: 8px; color: var(--text-label); opacity: 0.5;
+}
+.btn-cancel-tx {
+    background: transparent; border: 1px solid #7a2828;
+    color: #e57373; font-family: var(--font-mono); font-size: 8px;
+    padding: 2px 6px; border-radius: 2px; cursor: pointer;
+    transition: all 0.2s;
+}
+.btn-cancel-tx:hover {
+    background: #7a2828; color: #fff;
+}
+
+/* ── TICKET FORM ── */
+#ticket-form-area {
+    flex: 1; position: relative; min-height: 0;
+    margin-top: 2px;
+}
+
+.form-step {
+    position: absolute; inset: 0;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    gap: 6px;
+    opacity: 0; visibility: hidden;
+    transform: translateY(4px);
+    transition: opacity 0.3s var(--ease), transform 0.3s var(--ease), visibility 0s 0.3s;
+}
+.form-step.visible {
+    opacity: 1; visibility: visible; transform: translateY(0);
+    transition: opacity 0.3s var(--ease), transform 0.3s var(--ease), visibility 0s 0s;
+}
+
+/* Waiting Card */
+.waiting-card {
+    background: rgba(30, 24, 18, 0.7);
+    border: 1px dashed var(--border);
+    border-radius: 4px; padding: 10px 14px;
+    width: 92%; max-width: 400px;
+    display: flex; flex-direction: column; gap: 8px;
+    text-align: center;
+}
+.waiting-header {
+    display: flex; align-items: center; justify-content: center; gap: 6px;
+}
+.waiting-status-dot {
+    width: 6px; height: 6px; border-radius: 50%;
+    background: var(--green-bright);
+    box-shadow: 0 0 5px rgba(46,204,113,0.6);
+}
+.waiting-title {
+    font-family: var(--font-mono); font-size: 9px;
+    color: var(--ir-cream); letter-spacing: 1px; font-weight: 700;
+}
+.waiting-info-box {
+    display: flex; flex-direction: column; gap: 4px;
+}
+.waiting-msg {
+    font-family: var(--font-mono); font-size: 9.5px;
+    color: var(--text-dim);
+}
+.waiting-passenger-highlight {
+    background: rgba(212, 160, 23, 0.1);
+    border: 1px solid rgba(212, 160, 23, 0.3);
+    border-radius: 3px; padding: 4px 8px;
+    display: flex; flex-direction: column; gap: 2px;
+}
+.wph-label {
+    font-family: var(--font-mono); font-size: 7.5px;
+    color: var(--accent-dim); letter-spacing: 0.8px;
+}
+.wph-name {
+    font-family: var(--font-sans); font-size: 13px; font-weight: 700;
+    color: var(--ir-yellow);
+}
+.waiting-action-row {
+    display: flex; gap: 6px; justify-content: center; margin-top: 2px;
+}
+.waiting-action-row .opt-btn {
+    font-size: 9px; padding: 6px 10px;
+}
+
+/* Step labels and questions */
+.step-label {
+    font-family: var(--font-mono); font-size: 9px;
+    color: var(--accent-dim); letter-spacing: 1px;
+    text-transform: uppercase; width: 100%; text-align: center;
+}
+.step-label span {
+    color: var(--ir-yellow); font-weight: 700;
+}
+.step-question {
+    font-family: var(--font-mono); font-size: 10px; font-weight: 600;
+    color: var(--text-bright); letter-spacing: 1px;
+    text-transform: uppercase;
+}
+.step-hint {
+    font-family: var(--font-mono); font-size: 8px;
+    color: var(--text-dim); text-align: center; max-width: 320px;
+}
+
+.btn-row {
+    display: flex; gap: 6px;
+}
+.opt-btn {
+    padding: 6px 12px;
+    background: var(--bg-input); border: 1px solid var(--border);
+    border-radius: var(--radius); color: var(--text);
+    font-family: var(--font-mono); font-size: 9.5px;
+    letter-spacing: 0.8px; text-transform: uppercase;
+    cursor: pointer;
+    transition: background var(--dur-fast) var(--ease), border-color var(--dur-fast) var(--ease), color var(--dur-fast) var(--ease);
+}
+.opt-btn:hover {
+    background: var(--border); border-color: var(--accent-dim); color: var(--text-bright);
+}
+.opt-btn.selected {
+    background: var(--ir-maroon); border-color: var(--ir-yellow); color: var(--ir-cream);
+}
+.next-btn {
+    background: var(--ir-maroon); color: var(--ir-cream);
+    border-color: var(--ir-yellow); font-weight: 600;
+}
+.next-btn:hover {
+    background: #A52020;
+}
+
+/* Step navigation row */
+.step-nav-row {
+    display: flex; align-items: center; justify-content: center;
+    gap: 8px; width: 100%; margin-top: 4px;
+}
+.step-back-btn {
+    padding: 5px 10px;
+    background: transparent; border: 1px solid var(--border-light);
+    border-radius: var(--radius); color: var(--text-dim);
+    font-family: var(--font-mono); font-size: 9px;
+    cursor: pointer; transition: all 0.2s;
+}
+.step-back-btn:hover {
+    border-color: var(--text); color: var(--text-bright); background: rgba(255,255,255,0.05);
+}
+
+/* station selects */
+.station-selects {
+    display: flex; align-items: center; gap: 6px; width: 100%;
+}
+.sel-group {
+    flex: 1; display: flex; flex-direction: column; gap: 2px;
+}
+.sel-group label {
+    font-family: var(--font-mono); font-size: 8px;
+    color: var(--text-label); letter-spacing: 1px; text-transform: uppercase;
+}
+.sel-group select {
+    padding: 6px 8px;
+    background: var(--bg-input); border: 1px solid var(--border);
+    border-radius: var(--radius); color: var(--text-bright);
+    font-family: var(--font-mono); font-size: 10px;
+    outline: none; cursor: pointer; width: 100%;
+    -webkit-appearance: none; appearance: none;
+}
+.sel-group select:focus { border-color: var(--accent-dim); }
+.arrow-icon {
+    font-family: var(--font-mono); color: var(--text-label);
+    font-size: 14px; margin-top: 12px;
+}
+
+/* quantity */
+.qty-row {
+    display: flex; align-items: center; gap: 16px;
+}
+.qty-btn {
+    width: 30px; height: 30px;
+    background: var(--bg-input); border: 1px solid var(--border);
+    border-radius: 50%; color: var(--text-bright);
+    font-family: var(--font-mono); font-size: 16px;
+    cursor: pointer; display: flex; align-items: center; justify-content: center;
+    transition: background var(--dur-fast) var(--ease);
+}
+.qty-btn:hover { background: var(--border); }
+.qty-display {
+    font-family: var(--font-mono); font-size: 22px;
+    font-weight: 700; color: var(--text-bright);
+    min-width: 30px; text-align: center;
+}
+
+/* summary card */
+.summary-card {
+    width: 100%;
+    background: var(--bg-input); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 8px 10px;
+    font-family: var(--font-mono); font-size: 9px;
+    line-height: 1.7; color: var(--text);
+}
+.summary-card .s-row {
+    display: flex; justify-content: space-between;
+}
+.summary-card .s-val { color: var(--text-bright); }
+.summary-card .s-total {
+    border-top: 1px solid var(--border); margin-top: 4px; padding-top: 4px;
+    color: var(--accent); font-weight: 600; font-size: 11px;
+}
+
+/* pay button */
+.pay-btn {
+    width: 100%; padding: 9px 0;
+    background: var(--green); border: none;
+    border-radius: var(--radius); color: #fff;
+    font-family: var(--font-mono); font-size: 12px;
+    font-weight: 600; letter-spacing: 1px;
+    cursor: pointer;
+    transition: background var(--dur-fast) var(--ease);
+}
+.pay-btn:hover { background: var(--green-bright); }
+
+
+/* ═══ QUEUE AREA — with realistic walking people ═══ */
+#queue-area {
+    flex: 1; min-height: 0;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    position: relative;
+    padding: 0 20px;
+    background: linear-gradient(180deg, rgba(34,30,23,0) 0%, rgba(34,30,23,0.5) 100%);
+}
+
+#queue-track {
+    display: flex; align-items: center; width: 100%;
+    position: relative; height: 60px;
+}
+
+.queue-rope {
+    position: absolute; top: 50%; height: 2px;
+    background: repeating-linear-gradient(90deg, var(--ir-maroon) 0px, var(--ir-maroon) 8px, transparent 8px, transparent 12px);
+    width: 100%;
+    opacity: 0.6;
+}
+#queue-rope-left { top: calc(50% - 20px); }
+#queue-rope-right { top: calc(50% + 20px); }
+
+/* Rope stanchions */
+.queue-rope::before, .queue-rope::after {
+    content: '';
+    position: absolute; top: -8px;
+    width: 4px; height: 18px;
+    background: var(--ir-maroon);
+    border-radius: 2px;
+}
+.queue-rope::before { left: 0; }
+.queue-rope::after { right: 0; }
+
+#queue-lane {
+    position: relative; width: 100%; height: 60px;
+    display: flex; align-items: center;
+    gap: 6px;
+    justify-content: center;
+    padding: 0 60px;
+}
+
+/* ── Realistic Standing Person (SVG-based) ── */
+.person {
+    width: 22px; height: 42px;
+    position: relative;
+    flex-shrink: 0;
+    transition: transform 2s var(--ease), opacity 1.2s var(--ease), left 2s var(--ease), top 2s var(--ease);
+}
+.person-body {
+    width: 100%; height: 100%;
+    display: flex; align-items: center; justify-content: center;
+    position: relative;
+}
+.person-body svg {
+    width: 100%; height: 100%;
+}
+.person.at-counter .person-body svg .person-shirt {
+    fill: var(--ir-yellow);
+}
+
+/* Queue people: gentle idle sway only — no walking animation */
+.person {
+    animation: person-idle 4s ease-in-out infinite;
+}
+@keyframes person-idle {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-1px); }
+}
+
+/* Served: person turns left and walks down toward platform */
+.person.served {
+    animation: person-walk-to-platform 2.5s var(--ease) forwards;
+}
+@keyframes person-walk-to-platform {
+    0%   { opacity: 1; transform: translateX(0) translateY(0) scaleX(1); }
+    15%  { opacity: 1; transform: translateX(0) translateY(0) scaleX(-1); }
+    100% { opacity: 0; transform: translateX(-120px) translateY(80px) scaleX(-1) scale(0.6); }
+}
+
+.person.arriving {
+    animation: person-arrive 1s var(--ease) both;
+}
+@keyframes person-arrive {
+    from { opacity: 0; transform: translateX(-40px) scale(0.5); }
+    to { opacity: 1; transform: translateX(0) scale(1); }
+}
+
+/* No walk animations for queue people — they stand still */
+/* Walking is only for platform-person and fob-person classes */
+
+#queue-info {
+    display: flex; align-items: center; gap: 6px;
+    margin-top: 4px;
+}
+.qi-label {
+    font-family: var(--font-mono); font-size: 8px;
+    letter-spacing: 2px; color: var(--text-label); text-transform: uppercase;
+}
+.qi-count {
+    font-family: var(--font-mono); font-size: 14px;
+    font-weight: 700; color: var(--ir-yellow);
+}
+
+
+/* ═══ PLATFORM (BOTTOM HALF) ═══ */
+#platform {
+    height: 44%; min-height: 0;
+    display: flex; flex-direction: column;
+    background: var(--platform-bg);
+    flex-shrink: 0;
+    position: relative;
+}
+
+/* ── Platform Header with IR styling ── */
+#platform-header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 6px 20px;
+    border-bottom: 2px solid var(--ir-maroon);
+    flex-shrink: 0; height: 32px;
+    background: linear-gradient(180deg, #2a241c 0%, #221e17 100%);
+}
+.platform-name {
+    font-family: var(--font-mono); font-size: 11px;
+    letter-spacing: 3px; color: var(--ir-yellow);
+    text-transform: uppercase; font-weight: 600;
+    text-shadow: 0 0 8px rgba(241,196,15,0.3);
+}
+.platform-indicators {
+    display: flex; gap: 20px;
+}
+.track-indicator {
+    display: flex; align-items: center; gap: 6px;
+}
+.track-label {
+    font-family: var(--font-mono); font-size: 8px;
+    letter-spacing: 1px; color: var(--text-label); text-transform: uppercase;
+}
+.track-status {
+    font-family: var(--font-mono); font-size: 9px;
+    color: var(--text-dim);
+}
+.track-status.arriving { color: var(--amber); animation: blink-status 1s infinite; }
+.track-status.stopped  { color: var(--green-bright); }
+.track-status.departing { color: var(--red); animation: blink-status 0.5s infinite; }
+@keyframes blink-status { 0%,100%{opacity:1;} 50%{opacity:0.4;} }
+
+
+/* ── TRAIN INDICATOR BOARD ── */
+.train-indicator-board {
+    position: absolute; top: 34px; left: 50%; transform: translateX(-50%);
+    background: #0a0a0a;
+    border: 2px solid #333;
+    border-radius: 4px;
+    padding: 4px 16px;
+    display: flex; gap: 20px;
+    z-index: 8;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.6);
+    min-width: 500px;
+    justify-content: center;
+}
+.indicator-item {
+    display: flex; align-items: center; gap: 8px;
+    font-family: var(--font-mono); font-size: 9px;
+}
+.indicator-pf {
+    color: var(--ir-yellow); font-weight: 700; letter-spacing: 1px;
+}
+.indicator-train-name {
+    color: #ff6600; min-width: 80px;
+}
+.indicator-dest {
+    color: var(--green-bright); min-width: 100px;
+}
+.indicator-eta {
+    color: var(--ir-yellow); min-width: 50px; text-align: right;
+}
+.indicator-separator {
+    width: 1px; background: #333; margin: 0 4px;
+}
+
+
+/* ── FOOT OVERBRIDGE (FOB) ── */
+.foot-overbridge {
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 100%;
+    pointer-events: none;
+    z-index: 7;
+}
+
+.fob-bridge {
+    position: absolute;
+    height: 14px;
+    background: linear-gradient(180deg, #5a5045 0%, #4a4238 60%, #3a3530 100%);
+    border-bottom: 2px solid #6a6050;
+    border-top: 1px solid #6a6050;
+    z-index: 7;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+}
+.fob-bridge::after {
+    content: '';
+    position: absolute; inset: 0;
+    background: repeating-linear-gradient(
+        90deg,
+        transparent 0px, transparent 18px,
+        rgba(0,0,0,0.15) 18px, rgba(0,0,0,0.15) 20px
+    );
+}
+
+.fob-pillar {
+    position: absolute;
+    width: 6px;
+    background: linear-gradient(90deg, #5a5045, #4a4238);
+    z-index: 6;
+    box-shadow: 2px 0 4px rgba(0,0,0,0.3);
+}
+
+/* Bridge railing pattern */
+.fob-railing {
+    position: absolute;
+    height: 6px;
+    z-index: 8;
+    background: repeating-linear-gradient(
+        90deg,
+        #6a6050 0px, #6a6050 2px,
+        transparent 2px, transparent 8px
+    );
+    border-top: 1px solid #7a7060;
+}
+
+/* ── FOB Walking People ── */
+.fob-person {
+    position: absolute;
+    z-index: 9;
+    opacity: 0.7;
+}
+.fob-person svg {
+    width: 10px; height: 18px;
+}
+
+
+/* ── STAIRCASE ── */
+.staircase {
+    position: absolute;
+    z-index: 6;
+    overflow: visible;
+}
+.staircase-body {
+    width: 100%; height: 100%;
+    background: linear-gradient(180deg, #5a5548, #4a4540);
+    border: 1px solid #6a6358;
+    border-radius: 1px;
+    position: relative;
+    overflow: hidden;
+}
+.staircase-steps {
+    position: absolute; inset: 0;
+    background: repeating-linear-gradient(
+        var(--stair-angle, 150deg),
+        #4a4238 0px, #4a4238 3px,
+        #3a3530 3px, #3a3530 6px
+    );
+}
+.staircase-rail-left, .staircase-rail-right {
+    position: absolute; top: 0; bottom: 0;
+    width: 2px; background: #7a7060;
+}
+.staircase-rail-left { left: -1px; }
+.staircase-rail-right { right: -1px; }
+.staircase-label {
+    position: absolute; bottom: -12px; left: 50%; transform: translateX(-50%);
+    font-family: var(--font-mono); font-size: 6px;
+    color: var(--text-label); letter-spacing: 1px; white-space: nowrap;
+}
+
+
+/* ── TRACKS ── */
+#tracks-area {
+    flex: 1; display: flex; flex-direction: column;
+    justify-content: center; gap: 0;
+    min-height: 0; position: relative;
+}
+
+.track {
+    height: 34px; position: relative;
+    display: flex; flex-direction: column;
+    justify-content: center;
+}
+.rail {
+    height: 3px; background: linear-gradient(180deg, #888075, #5a5548, #888075);
+    width: 100%;
+    position: absolute;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.3);
+}
+.top-rail { top: 4px; }
+.bottom-rail { bottom: 4px; }
+
+.sleepers {
+    position: absolute; inset: 0;
+    background: repeating-linear-gradient(
+        90deg,
+        transparent, transparent 16px,
+        var(--sleeper) 16px, var(--sleeper) 20px
+    );
+    opacity: 0.5;
+}
+
+/* Ballast texture between rails */
+.track::before {
+    content: '';
+    position: absolute; top: 7px; bottom: 7px; left: 0; right: 0;
+    background: var(--ballast);
+    opacity: 0.4;
+}
+
+
+/* ── PLATFORM STRIP ── */
+#platform-strip {
+    height: 40px; position: relative;
+    display: flex; flex-direction: column;
+}
+.platform-edge {
+    height: 4px;
+    background: linear-gradient(90deg, var(--ir-yellow) 0%, var(--accent-dim) 50%, var(--ir-yellow) 100%);
+    box-shadow: 0 0 6px rgba(241,196,15,0.2);
+}
+.platform-floor {
+    flex: 1;
+    background: linear-gradient(180deg, var(--platform-floor-color) 0%, #352d20 100%);
+    display: flex; align-items: center; justify-content: space-around;
+    padding: 0 40px;
+    position: relative;
+}
+.platform-marking {
+    width: 28px; height: 2px; background: var(--ir-yellow);
+    border-radius: 1px;
+    opacity: 0.3;
+}
+
+/* ── Platform People (walking on platform) ── */
+.platform-person {
+    position: absolute;
+    z-index: 6;
+    transition: left 3s linear, right 3s linear;
+}
+.platform-person svg {
+    width: 12px; height: 22px;
+}
+.platform-person.walking-left {
+    animation: platform-walk-left 20s linear infinite;
+}
+.platform-person.walking-right {
+    animation: platform-walk-right 20s linear infinite;
+}
+@keyframes platform-walk-left {
+    0% { transform: translateX(0) scaleX(-1); }
+    100% { transform: translateX(-600px) scaleX(-1); }
+}
+@keyframes platform-walk-right {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(600px); }
+}
+
+/* ── Boarding/Alighting people near trains ── */
+.boarding-person {
+    position: absolute;
+    z-index: 6;
+    opacity: 0;
+}
+.boarding-person svg {
+    width: 10px; height: 18px;
+}
+.boarding-person.alighting {
+    animation: alight-train 2s ease-out forwards;
+}
+.boarding-person.boarding {
+    animation: board-train 2s ease-in forwards;
+}
+@keyframes alight-train {
+    0% { opacity: 0; transform: translateY(-8px); }
+    20% { opacity: 1; transform: translateY(0); }
+    100% { opacity: 0.7; transform: translateY(14px) translateX(var(--drift-x, 10px)); }
+}
+@keyframes board-train {
+    0% { opacity: 0.7; transform: translateY(14px); }
+    80% { opacity: 1; transform: translateY(0); }
+    100% { opacity: 0; transform: translateY(-8px); }
+}
+
+
+/* ── TRAINS — Realistic Indian Railway EMU ── */
+.train {
+    position: absolute;
+    height: 26px; top: 50%; transform: translateY(-50%);
+    display: flex;
+    transition: none; /* JS controls animation */
+    z-index: 5;
+}
+.train.hidden { display: none; }
+
+.train-coach {
+    height: 26px; width: 56px;
+    background: var(--train-body);
+    border: 1px solid #0d3652;
+    margin-right: 1px;
+    position: relative;
+    display: flex; align-items: center; justify-content: center;
+    border-radius: 1px;
+}
+/* Horizontal stripe band — IR cream/yellow */
+.train-coach::after {
+    content: '';
+    position: absolute; bottom: 3px; left: 0; right: 0;
+    height: 3px;
+    background: var(--ir-yellow);
+}
+/* Upper stripe — maroon band */
+.train-coach .upper-stripe {
+    position: absolute; top: 0; left: 0; right: 0;
+    height: 4px;
+    background: var(--ir-maroon);
+}
+
+/* Windows row */
+.train-coach::before {
+    content: '';
+    position: absolute; top: 6px; left: 4px; right: 4px;
+    height: 7px;
+    background: repeating-linear-gradient(
+        90deg,
+        #0a2a42 0px, #0a2a42 7px,
+        #4a9ac4 7px, #4a9ac4 9px
+    );
+    border-radius: 1px;
+    box-shadow: inset 0 0 2px rgba(0,0,0,0.4);
+}
+
+/* Door openings */
+.coach-door {
+    position: absolute; top: 4px; bottom: 2px;
+    width: 5px;
+    background: #0a1a2a;
+    border: 1px solid #0d3652;
+}
+.coach-door.door-left { left: 14px; }
+.coach-door.door-right { right: 14px; }
+
+/* Engine / Motorcoach */
+.train-coach.engine {
+    border-radius: 6px 1px 1px 6px;
+    width: 50px;
+    background: linear-gradient(90deg, #0d3652 0%, var(--train-body) 30%);
+}
+.train-coach.engine::after {
+    background: var(--ir-yellow);
+    height: 4px;
+    border-radius: 0 0 0 3px;
+}
+/* Engine front light */
+.train-coach.engine .headlight {
+    position: absolute; left: 3px; top: 50%; transform: translateY(-50%);
+    width: 4px; height: 4px; border-radius: 50%;
+    background: #ffee88;
+    box-shadow: 0 0 6px 2px rgba(255,238,136,0.6);
+}
+
+.train-coach.last {
+    border-radius: 1px 6px 6px 1px;
+    margin-right: 0;
+}
+
+/* Destination board on the coach */
+.coach-dest-board {
+    position: absolute; top: 1px; left: 50%; transform: translateX(-50%);
+    font-family: var(--font-mono); font-size: 4px;
+    color: #ff8800; background: #111;
+    padding: 0 3px; border-radius: 1px;
+    white-space: nowrap; letter-spacing: 0.5px;
+    z-index: 2;
+}
+
+/* track 2 trains go opposite direction */
+#track-2 .train-coach.engine {
+    border-radius: 1px 6px 6px 1px;
+    order: 999;
+    background: linear-gradient(270deg, #0d3652 0%, var(--train-body) 30%);
+}
+#track-2 .train-coach.engine::after {
+    border-radius: 0 0 3px 0;
+}
+#track-2 .train-coach.engine .headlight {
+    left: auto; right: 3px;
+}
+#track-2 .train-coach.last {
+    border-radius: 6px 1px 1px 6px;
+}
+
+
+/* ── TRAIN INFO BAR — LED-style display ── */
+#train-info-bar {
+    display: flex; height: 28px; flex-shrink: 0;
+    border-top: 2px solid var(--ir-maroon);
+    background: #0a0a0a;
+}
+.train-info-item {
+    flex: 1; display: flex; align-items: center;
+    gap: 10px; padding: 0 16px;
+    font-family: var(--font-mono); font-size: 9px;
+    border-right: 1px solid #222;
+}
+.train-info-item:last-child { border-right: none; }
+.info-direction {
+    color: var(--ir-yellow); letter-spacing: 1px;
+    text-transform: uppercase; font-size: 8px; font-weight: 700;
+}
+.info-dest {
+    color: #ff6600; letter-spacing: 0.5px;
+    text-shadow: 0 0 4px rgba(255,102,0,0.3);
+}
+.info-time {
+    color: var(--green-bright); margin-left: auto;
+    text-shadow: 0 0 4px rgba(46,204,113,0.3);
+}
+
+
+/* ═══ LOG SIDEBAR ═══ */
+#log-sidebar {
+    position: fixed; right: 0; top: 40px; bottom: 0;
+    width: 200px; background: var(--bg-card);
+    border-left: 1px solid var(--border);
+    transform: translateX(100%);
+    transition: transform var(--dur) var(--ease);
+    z-index: 20; display: flex; flex-direction: column;
+}
+#log-sidebar.open {
+    transform: translateX(0);
+}
+#log-toggle {
+    position: absolute; left: -50px; top: 10px;
+    background: var(--ir-maroon); border: 1px solid var(--ir-yellow);
+    border-right: none; border-radius: var(--radius) 0 0 var(--radius);
+    padding: 6px 10px;
+    font-family: var(--font-mono); font-size: 9px;
+    letter-spacing: 1px; color: var(--ir-cream);
+    cursor: pointer; white-space: nowrap;
+}
+#log-content {
+    flex: 1; overflow-y: auto; min-height: 0;
+    scrollbar-width: none; -ms-overflow-style: none;
+}
+#log-content::-webkit-scrollbar { display: none; }
+#log-feed {
+    display: flex; flex-direction: column;
+}
+.log-entry {
+    padding: 6px 12px; border-bottom: 1px solid var(--border-light);
+    font-family: var(--font-mono); font-size: 9px;
+    line-height: 1.5; color: var(--text-dim);
+    animation: log-in 0.6s var(--ease) both;
+}
+.log-entry .log-time { color: var(--text-label); margin-right: 4px; }
+.log-entry.success { color: var(--green); }
+.log-entry.warning { color: var(--amber); }
+.log-entry.error   { color: var(--red); }
+@keyframes log-in {
+    from { opacity:0; transform:translateY(-3px); }
+    to { opacity:1; transform:translateY(0); }
+}
+
+
+/* ═══ STATS BAR ═══ */
+#stats-bar {
+    position: fixed; bottom: 8px; left: 50%; transform: translateX(-50%);
+    display: flex; gap: 0; z-index: 15;
+    background: var(--ir-maroon); border: 2px solid var(--ir-yellow);
+    border-radius: var(--radius-m); overflow: hidden;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.5);
+}
+.stat-chip {
+    display: flex; align-items: center; gap: 6px;
+    padding: 5px 14px;
+    border-right: 1px solid rgba(241,196,15,0.3);
+}
+.stat-chip:last-child { border-right: none; }
+.sc-label {
+    font-family: var(--font-mono); font-size: 8px;
+    letter-spacing: 1.5px; color: var(--ir-cream); text-transform: uppercase;
+    opacity: 0.7;
+}
+.sc-val {
+    font-family: var(--font-mono); font-size: 12px;
+    font-weight: 600; color: var(--ir-yellow);
+}
+
+
+/* ═══ TOAST ═══ */
+#toast-container {
+    position: fixed; top: 50px; left: 50%; transform: translateX(-50%);
+    display: flex; flex-direction: column; gap: 6px;
+    z-index: 100; pointer-events: none;
+}
+.toast {
+    padding: 8px 24px; border-radius: var(--radius-m);
+    font-family: var(--font-mono); font-size: 11px;
+    letter-spacing: 0.5px; color: #fff; white-space: nowrap;
+    animation: toast-in 0.6s var(--ease) both;
+    pointer-events: auto;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+}
+.toast.success { background: var(--green); }
+.toast.error   { background: var(--red); }
+.toast.warning { background: var(--amber); color: #1a1a1a; }
+.toast.info    { background: var(--ir-blue); }
+.toast.out { animation: toast-out 0.5s var(--ease) both; }
+@keyframes toast-in {
+    from { opacity:0; transform:translateY(-8px) scale(0.95); }
+    to { opacity:1; transform:translateY(0) scale(1); }
+}
+@keyframes toast-out {
+    from { opacity:1; transform:translateY(0) scale(1); }
+    to { opacity:0; transform:translateY(-6px) scale(0.95); }
+}
+
+
+/* ═══ STAIRCASE on platform ═══ */
+.platform-stairs {
+    position: absolute;
+    z-index: 5;
+}
+.platform-stairs .stair-body {
+    width: 100%; height: 100%;
+    background: repeating-linear-gradient(
+        var(--stair-angle, 145deg),
+        #4a4238 0px, #4a4238 3px,
+        #3a3530 3px, #3a3530 6px
+    );
+    border: 1px solid #5a5548;
+    border-radius: 1px;
+}
+
+/* ═══ WATER COOLER / BENCH — Platform furniture ═══ */
+.platform-bench {
+    position: absolute;
+    width: 20px; height: 6px;
+    background: #5a5045;
+    border: 1px solid #6a6050;
+    border-radius: 1px;
+    z-index: 5;
+}
+.platform-bench::before {
+    content: 'BENCH';
+    position: absolute; top: -8px; left: 50%; transform: translateX(-50%);
+    font-family: var(--font-mono); font-size: 4px;
+    color: var(--text-label); letter-spacing: 0.5px; white-space: nowrap;
+}
+
+
+/* ═══════════════════════════════════════════════════════
+   UTS SUBURBAN TICKET CONFIRMATION MODAL
+   Authentic Indian Railways Thermal Ticket Card Design
+   ═══════════════════════════════════════════════════════ */
+.ticket-modal-overlay {
+    position: fixed; inset: 0;
+    background: rgba(10, 8, 5, 0.82);
+    backdrop-filter: blur(5px);
+    display: flex; align-items: center; justify-content: center;
+    z-index: 999;
+    animation: fadeIn 0.3s var(--ease);
+}
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+.ticket-card-popup {
+    width: 440px; max-width: 95vw;
+    background: #fdfaf2;
+    color: #1a1510;
+    border-radius: 6px;
+    box-shadow: 0 16px 40px rgba(0,0,0,0.7), 0 0 0 1px rgba(0,0,0,0.1);
+    border-top: 5px solid #8B1A1A;
+    overflow: hidden;
+    display: flex; flex-direction: column;
+    animation: popUp 0.35s cubic-bezier(0.18, 0.89, 0.32, 1.28);
+    position: relative;
+}
+@keyframes popUp {
+    from { transform: scale(0.85) translateY(20px); opacity: 0; }
+    to { transform: scale(1) translateY(0); opacity: 1; }
+}
+
+.ticket-header-strip {
+    display: flex; align-items: center; justify-content: space-between;
+    background: #8B1A1A; color: #F5E6C8;
+    padding: 8px 14px;
+    border-bottom: 2px solid #F1C40F;
+}
+.ticket-ir-emblem {
+    font-family: var(--font-mono); font-size: 13px; font-weight: 800;
+    background: #F5E6C8; color: #8B1A1A;
+    padding: 2px 6px; border-radius: 3px; letter-spacing: 1px;
+}
+.ticket-header-title {
+    display: flex; flex-direction: column; text-align: center;
+}
+.th-main {
+    font-family: var(--font-sans); font-size: 11px; font-weight: 700;
+    letter-spacing: 1px; color: #F1C40F;
+}
+.th-sub {
+    font-family: var(--font-mono); font-size: 8px; letter-spacing: 0.5px; opacity: 0.85;
+}
+.ticket-uts-badge {
+    font-family: var(--font-mono); font-size: 8px; font-weight: 700;
+    background: #27AE60; color: #fff; padding: 2px 6px; border-radius: 3px;
+    letter-spacing: 0.5px;
+}
+
+.ticket-body {
+    padding: 14px 18px 10px;
+    display: flex; flex-direction: column; gap: 10px;
+}
+
+.ticket-meta-row {
+    display: flex; justify-content: space-between; align-items: center;
+    border-bottom: 1px dashed #d6cca8; padding-bottom: 6px;
+    font-family: var(--font-mono); font-size: 9px; color: #6b5f48;
+}
+.ticket-meta-row strong {
+    color: #8B1A1A; font-size: 11px;
+}
+
+.ticket-passenger-row {
+    display: flex; justify-content: space-between; align-items: baseline;
+    background: #f4edd7; padding: 6px 10px; border-radius: 4px;
+}
+.t-label {
+    font-family: var(--font-mono); font-size: 8px; color: #7a6e55;
+    letter-spacing: 0.8px; text-transform: uppercase;
+}
+.t-value.highlight {
+    font-family: var(--font-sans); font-size: 14px; font-weight: 700;
+    color: #1a1510;
+}
+
+.ticket-route-block {
+    display: flex; align-items: center; justify-content: space-between;
+    background: #faf4e3; border: 1px solid #e2d7ba; border-radius: 4px;
+    padding: 10px 14px; text-align: center;
+}
+.t-station {
+    font-family: var(--font-sans); font-size: 13px; font-weight: 700;
+    color: #154360; display: block; margin-top: 2px;
+}
+.route-arrow-wrap {
+    display: flex; flex-direction: column; align-items: center; gap: 2px;
+}
+.route-line-label {
+    font-family: var(--font-mono); font-size: 7.5px; font-weight: 700;
+    color: #8B1A1A; letter-spacing: 0.5px;
+}
+.route-arrow-icon {
+    font-size: 11px; color: #D4A017;
+}
+.route-dist {
+    font-family: var(--font-mono); font-size: 8px; color: #666;
+}
+
+.ticket-grid {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 6px;
+    background: #f7f1df; padding: 8px 10px; border-radius: 4px;
+}
+.tg-item {
+    display: flex; flex-direction: column; gap: 2px;
+}
+.tg-item .t-val {
+    font-family: var(--font-mono); font-size: 10px; font-weight: 600;
+    color: #2c251d;
+}
+
+.ticket-fare-row {
+    display: flex; justify-content: space-between; align-items: center;
+    background: #8B1A1A; color: #fff; padding: 8px 14px;
+    border-radius: 4px; margin-top: 2px;
+}
+.t-fare-desc {
+    font-family: var(--font-mono); font-size: 9px; letter-spacing: 0.5px;
+    color: #F5E6C8;
+}
+.t-fare-amount {
+    font-family: var(--font-mono); font-size: 18px; font-weight: 700;
+    color: #F1C40F;
+}
+
+.ticket-barcode-section {
+    display: flex; flex-direction: column; align-items: center; gap: 4px;
+    margin-top: 4px; border-top: 1px dashed #d6cca8; padding-top: 6px;
+}
+.ticket-barcode {
+    width: 80%; height: 26px;
+    background: repeating-linear-gradient(
+        90deg,
+        #111 0px, #111 2px,
+        transparent 2px, transparent 4px,
+        #111 4px, #111 7px,
+        transparent 7px, transparent 9px,
+        #111 9px, #111 11px,
+        transparent 11px, transparent 12px,
+        #111 12px, #111 15px
+    );
+    opacity: 0.85;
+}
+.ticket-auth-code {
+    font-family: var(--font-mono); font-size: 7.5px; color: #776a52;
+    letter-spacing: 0.8px; text-align: center;
+}
+
+.ticket-footer-actions {
+    padding: 10px 18px 14px;
+    background: #f3ecd6; border-top: 1px solid #e0d5b7;
+    display: flex; justify-content: center;
+}
+.ticket-btn-done {
+    width: 100%; padding: 10px;
+    background: #27AE60; color: #fff;
+    border: none; border-radius: 4px;
+    font-family: var(--font-mono); font-size: 11px; font-weight: 700;
+    letter-spacing: 1px; text-transform: uppercase;
+    cursor: pointer; transition: background 0.2s, box-shadow 0.2s;
+}
+.ticket-btn-done:hover {
+    background: #2ECC71;
+    box-shadow: 0 4px 12px rgba(46, 204, 113, 0.4);
+}
